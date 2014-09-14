@@ -9,8 +9,8 @@ double Setpoint_right, right_sonar, Output_right;
 double Setpoint_front, front_sonar, Output_front;
 double Setpoint_left, left_sonar, Output_left;
 double Setpoint_rear, rear_sonar, Output_rear;
-const double PIDSampleTime=100; //interval in ms
-const double safe_distance=90; //value in cm
+const double PIDSampleTime=66; //interval in ms
+const double safe_distance=30; //value in cm
 const double OutMax=600; //value in ms
 const double P=7;
 const double I=3;
@@ -210,6 +210,14 @@ void report(){
   /*Serial.print(F("{TIMEPLOT:PID|data|Output_right|T|"));
   Serial.print(Output_right);
   Serial.print(F("}"));*/
+  
+  Serial.print(F("{TIMEPLOT:PID|data|Output_front|T|"));
+  Serial.print(Output_front);
+  Serial.print(F("}"));
+  
+  Serial.print(F("{TIMEPLOT:PID|data|Output_rear|T|"));
+  Serial.print(Output_rear);
+  Serial.print(F("}"));
 
   /*Serial.print(F("{TIMEPLOT:PID|data|Output_left|T|"));
   Serial.print(Output_left);
@@ -238,36 +246,40 @@ void report(){
   /*Serial.print(F("{TIMEPLOT:PID|data|AileronOut|T|"));
   Serial.print(compd_roll);
   Serial.print(F("}"));*/
+  
+  Serial.print(F("{TIMEPLOT:PID|data|ElevonnOut|T|"));
+  Serial.print(compd_pitch);
+  Serial.print(F("}"));
 
-  Serial.print(F("{TIMEPLOT:PID|data|Aileron|T|"));
+  Serial.print(F("{TIMEPLOT:RC|data|Aileron|T|"));
   Serial.print(roll_in);
   Serial.println(F("}"));
   
-  Serial.print(F("{TIMEPLOT:PID|data|Elevon|T|"));
+  Serial.print(F("{TIMEPLOT:RC|data|Elevon|T|"));
   Serial.print(pitch_in);
   Serial.println(F("}"));
   
-  Serial.print(F("{TIMEPLOT:PID|data|Rudder|T|"));
+  Serial.print(F("{TIMEPLOT:RC|data|Rudder|T|"));
   Serial.print(yaw_in);
   Serial.println(F("}"));
   
-  Serial.print(F("{TIMEPLOT:PID|data|throttle|T|"));
+  Serial.print(F("{TIMEPLOT:RC|data|throttle|T|"));
   Serial.print(throttle_in);
   Serial.println(F("}"));
 
-  Serial.print(F("{TIMEPLOT:PID|data|Mode|T|"));
+  Serial.print(F("{TIMEPLOT:RC|data|Mode|T|"));
   Serial.print(mode_switch);
   Serial.println(F("}"));
   
-   Serial.print(F("{TIMEPLOT:PID|data|Aux1|T|"));
+   Serial.print(F("{TIMEPLOT:RC|data|Aux1|T|"));
    Serial.print(aux1);
    Serial.println(F("}"));
    
-   Serial.print(F("{TIMEPLOT:PIDsettings|data|Kd|T|"));
+   /*Serial.print(F("{TIMEPLOT:PIDsettings|data|Kd|T|"));
    Serial.print(PID_right.GetKd());
    Serial.println(F("}"));
    
-   /*Serial.print(F("{TIMEPLOT:PIDsettings|data|Ki|T|"));
+   Serial.print(F("{TIMEPLOT:PIDsettings|data|Ki|T|"));
    Serial.print(PID_right.GetKi());
    Serial.println(F("}"));
    
@@ -333,7 +345,7 @@ void workloop(){
   //Do we want obstacle avoidance on?
   if(aux1>1400){
     compd_roll=(roll_in-int(Output_right)+int(Output_left));
-    //compd_pitch=(pitch_in-int(Output_rear)+int(Output_front)); //remember to check the direction of pitch before testing
+    compd_pitch=(pitch_in-int(Output_rear)+int(Output_front)); //remember to check the direction of pitch before testing
     compd_roll=ConstrainPWM(compd_roll,1100,1950);
     compd_pitch=ConstrainPWM(compd_pitch,1100,1950);
   }
@@ -350,7 +362,7 @@ void workloop(){
 void loop() {
   tmp_time=millis();
 
-  if (tmp_time  >report_time+ 100){
+  if (tmp_time  >report_time+ 66){
     report();
   } 
   if (tmp_time  >work_time + PIDSampleTime){
