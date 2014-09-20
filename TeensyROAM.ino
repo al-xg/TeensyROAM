@@ -5,11 +5,11 @@ unsigned long tmp_time;
 #include "PID_ROAM.h"
 
 //Define Variables we'll be connecting to
-double Setpoint_right, right_sonar, Output_right;
-double Setpoint_front, front_sonar, Output_front;
-double Setpoint_left, left_sonar, Output_left;
-double Setpoint_rear, rear_sonar, Output_rear;
-const double PIDSampleTime=66; //interval in ms
+double Setpoint_right, right_sonar=100, Output_right=0;
+double Setpoint_front, front_sonar=100, Output_front=0;
+double Setpoint_left, left_sonar=100, Output_left=0;
+double Setpoint_rear, rear_sonar=100, Output_rear=0;
+const double PIDSampleTime=100; //interval in ms
 const double safe_distance=30; //value in cm
 const double OutMax=600; //value in ms
 const double P=7;
@@ -25,22 +25,26 @@ PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear,P,I,D, DIRECT);
 
 #include <i2c_t3.h>
 //The Arduino Wire library uses the 7-bit version of the address, so the code example uses 0x70 instead of the 8‑bit 0xE0
-#define FrontI2C byte(0x70) //A
-#define RearI2C byte(0x71)  //B
+#define frontI2C byte(0x70) //A
+#define rearI2C byte(0x71)  //B
 #define leftI2C byte(0x81)  //C
+#define rightI2C byte(0x82)  //D
 //The Sensor ranging command has a value of 0x51
 #define RangeCommand byte(0x51)
 
 short rangeA=-2;
 short rangeB=-2;
 short rangeC=-2;
+short rangeD=-2;
 
 bool Afn=0;
 bool Bfn=0;
 bool Cfn=0;
+bool Dfn=0;
 size_t Asz=0;
 size_t Bsz=0;
 size_t Csz=0;
+size_t Dsz=0;
 
 //Commands the sensor to take a range reading
 void takeRangeReading(byte Address){
@@ -71,23 +75,28 @@ void sortOutI2C(){
         Afn=0;
         Bfn=0;
         Cfn=0;
+        Dfn=0;
         Asz=0;
         Bsz=0;
-        Csz=0;        
+        Csz=0;
+        Dsz=0;        
         rangeA=-2;
         rangeB=-2;
         rangeC=-2;
+        rangeD=-2;
        
         int timeout=millis()+PIDSampleTime;
         //(Afn!=1)and(Bfn!=1)and(Cfn!=1)
         while ((1==1)and(timeout>millis())) {                
-                if ((Asz==2)){if(Afn==0){rangeA = readRange(FrontI2C);Afn=1;}}else{Asz = Wire.requestFrom(FrontI2C, byte(2));}               
-                if ((Bsz==2)){if(Bfn==0){rangeB = readRange(RearI2C);Bfn=1;}}else{Bsz = Wire.requestFrom(RearI2C, byte(2));}                
+                if ((Asz==2)){if(Afn==0){rangeA = readRange(frontI2C);Afn=1;}}else{Asz = Wire.requestFrom(frontI2C, byte(2));}               
+                if ((Bsz==2)){if(Bfn==0){rangeB = readRange(rearI2C);Bfn=1;}}else{Bsz = Wire.requestFrom(rearI2C, byte(2));}                
                 //if ((Csz==2)){if(Cfn==0){rangeC = readRange(leftI2C);Cfn=1;}}else{Csz = Wire.requestFrom(leftI2C, byte(2));}
+                //if ((Dsz==2)){if(Dfn==0){rangeD = readRange(rightI2C);Dfn=1;}}else{Dsz = Wire.requestFrom(rightI2C, byte(2));}
         }          
-        if (Afn){rangeA = readRange(FrontI2C);}  
-        if (Bfn){rangeB = readRange(RearI2C);}
+        if (Afn){rangeA = readRange(frontI2C);}  
+        if (Bfn){rangeB = readRange(rearI2C);}
         //if (Cfn){rangeC = readRange(leftI2C);}
+        //if (Dfn){rangeD = readRange(rightI2C);}
         //Serial.print(" info:");Serial.print(Asz);Serial.print(Bsz);//Serial.println(Csz);
 }
 
@@ -101,14 +110,14 @@ PulsePositionInput PPMin;
 
 //RC Inputs/outputs
 double channel[8];
-double pitch_in=1500; //channel 3
+double pitch_in=1500; //channel 4
 double roll_in=1500;  //channel 2
-double throttle_in=900;  //channel 1
-double yaw_in=900;  //channel 4
-double mode_switch=900;  //channel 5
-double aux1=900;  //channel 6
-double aux2=900;  //channel 7
-double gear=900;  //channel 8
+double throttle_in=1000;  //channel 3
+double yaw_in=1500;  //channel 1
+double mode_switch=1000;  //channel 5
+double aux1=1000;  //channel 6
+double aux2=1000;  //channel 7
+double gear=1000;  //channel 8
 int compd_pitch, compd_roll, compd_throttle;
 
 int ConstrainPWM(int PWM_out, int MinPW, int MaxPW){
@@ -128,10 +137,10 @@ void readPPM(){
 }
 
 void writePPM(){
-  PPMout.write(1, compd_throttle);
-  PPMout.write(3, compd_pitch);
+  PPMout.write(3, compd_throttle);
+  PPMout.write(4, compd_pitch);
   PPMout.write(2, compd_roll);
-  PPMout.write(4, yaw_in);
+  PPMout.write(1, yaw_in);
   PPMout.write(5, mode_switch);
   PPMout.write(6, aux1);
   PPMout.write(7, aux2);
@@ -164,9 +173,10 @@ void setup() {
   
   //Initiate sonar ranging ready for 1st loop
     sortOutI2C();
-    takeRangeReading(FrontI2C);
-    takeRangeReading(RearI2C);
-    takeRangeReading(leftI2C);
+    takeRangeReading(frontI2C);
+    takeRangeReading(rearI2C);
+    //takeRangeReading(leftI2C);
+    //takeRangeReading(rightI2C);
 
   //Initialise PID loops
   Setpoint_right= Setpoint_front = Setpoint_left = Setpoint_rear = safe_distance;
@@ -207,9 +217,9 @@ void buzzer(){
 
 void report(){
   report_time = millis();
-  /*Serial.print(F("{TIMEPLOT:PID|data|Output_right|T|"));
+  Serial.print(F("{TIMEPLOT:PID|data|Output_right|T|"));
   Serial.print(Output_right);
-  Serial.print(F("}"));*/
+  Serial.print(F("}"));
   
   Serial.print(F("{TIMEPLOT:PID|data|Output_front|T|"));
   Serial.print(Output_front);
@@ -219,17 +229,17 @@ void report(){
   Serial.print(Output_rear);
   Serial.print(F("}"));
 
-  /*Serial.print(F("{TIMEPLOT:PID|data|Output_left|T|"));
+  Serial.print(F("{TIMEPLOT:PID|data|Output_left|T|"));
   Serial.print(Output_left);
-  Serial.print(F("}"));*/
+  Serial.print(F("}"));
 
   Serial.print(F("{TIMEPLOT:PID|data|safe_distance|T|"));
   Serial.print(safe_distance);
   Serial.print(F("}"));
 
-  /*Serial.print(F("{TIMEPLOT:PID|data|RightSonar|T|"));
+  Serial.print(F("{TIMEPLOT:PID|data|RightSonar|T|"));
   Serial.print(right_sonar);
-  Serial.print(F("}"));*/
+  Serial.print(F("}"));
 
   Serial.print(F("{TIMEPLOT:PID|data|FrontSonar|T|"));
   Serial.print(front_sonar);
@@ -239,15 +249,15 @@ void report(){
   Serial.print(rear_sonar);
   Serial.print(F("}"));
 
-  /*Serial.print(F("{TIMEPLOT:PID|data|LeftSonar|T|"));
+  Serial.print(F("{TIMEPLOT:PID|data|LeftSonar|T|"));
   Serial.print(left_sonar);
-  Serial.print(F("}"));*/
+  Serial.print(F("}"));
 
-  /*Serial.print(F("{TIMEPLOT:PID|data|AileronOut|T|"));
+  Serial.print(F("{TIMEPLOT:PID|data|AileronOut|T|"));
   Serial.print(compd_roll);
-  Serial.print(F("}"));*/
+  Serial.print(F("}"));
   
-  Serial.print(F("{TIMEPLOT:PID|data|ElevonnOut|T|"));
+  Serial.print(F("{TIMEPLOT:PID|data|ElevonOut|T|"));
   Serial.print(compd_pitch);
   Serial.print(F("}"));
 
@@ -319,27 +329,30 @@ void workloop(){
     front_sonar= rangeA;  //read I2C sonar range, Value in cm
     rear_sonar= rangeB; //read I2C sonar range, Value in cm
     //left_sonar= rangeC; //read I2C sonar range, Value in cm
+    //right_sonar= rangeD; //read I2C sonar range, Value in cm
 
   //Refresh RC inputs  
   //readSpektrum();  
     readPPM();
-    pitch_in=channel[3];
+    pitch_in=channel[4];
     roll_in=channel[2];
-    throttle_in=channel[1];
-    yaw_in=channel[4];
+    throttle_in=channel[3];
+    yaw_in=channel[1];
     mode_switch=channel[5];
     aux1=channel[6];
    
   //Run PID loops
+  PID_rear.Compute();
   PID_right.Compute();
   PID_front.Compute();
   PID_left.Compute();
-  PID_rear.Compute();
+  
 
   //Start next ranging cycle
-    takeRangeReading(FrontI2C);
-    takeRangeReading(RearI2C);
+    takeRangeReading(frontI2C);
+    takeRangeReading(rearI2C);
     //takeRangeReading(leftI2C);
+    //takeRangeReading(rightI2C);
 
 
   //Do we want obstacle avoidance on?
@@ -348,10 +361,12 @@ void workloop(){
     compd_pitch=(pitch_in-int(Output_rear)+int(Output_front)); //remember to check the direction of pitch before testing
     compd_roll=ConstrainPWM(compd_roll,1100,1950);
     compd_pitch=ConstrainPWM(compd_pitch,1100,1950);
+    compd_throttle=throttle_in;
   }
   else {
     compd_roll=roll_in;
     compd_pitch=pitch_in;
+    compd_throttle=throttle_in;
   }
 
   //buzzer();
