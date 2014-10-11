@@ -1,5 +1,6 @@
 unsigned long report_time;
 unsigned long work_time;
+unsigned long RC_time;
 unsigned long tmp_time;
 
 #include "PID_ROAM.h"
@@ -9,8 +10,8 @@ double Setpoint_right, right_sonar=100, Output_right=0;
 double Setpoint_front, front_sonar=100, Output_front=0;
 double Setpoint_left, left_sonar=100, Output_left=0;
 double Setpoint_rear, rear_sonar=100, Output_rear=0;
-const double PIDSampleTime=100; //interval in ms
-const double safe_distance=30; //value in cm
+const double PIDSampleTime=68; //interval in ms
+const double safe_distance=25; //value in cm
 const double OutMax=600; //value in ms
 const double P=7;
 const double I=3;
@@ -32,10 +33,10 @@ PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear,P,I,D, DIRECT);
 //The Sensor ranging command has a value of 0x51
 #define RangeCommand byte(0x51)
 
-short rangeA=-2;
-short rangeB=-2;
-short rangeC=-2;
-short rangeD=-2;
+short rangeA=1000;
+short rangeB=1000;
+short rangeC=1000;
+short rangeD=1000;
 
 bool Afn=0;
 bool Bfn=0;
@@ -72,32 +73,52 @@ short readRange(byte Address){
 }
 
 void sortOutI2C(){
-        Afn=0;
-        Bfn=0;
-        Cfn=0;
-        Dfn=0;
-        Asz=0;
-        Bsz=0;
-        Csz=0;
-        Dsz=0;        
-        rangeA=-2;
-        rangeB=-2;
-        rangeC=-2;
-        rangeD=-2;
-       
-        int timeout=millis()+PIDSampleTime;
-        //(Afn!=1)and(Bfn!=1)and(Cfn!=1)
-        while ((1==1)and(timeout>millis())) {                
-                if ((Asz==2)){if(Afn==0){rangeA = readRange(frontI2C);Afn=1;}}else{Asz = Wire.requestFrom(frontI2C, byte(2));}               
-                if ((Bsz==2)){if(Bfn==0){rangeB = readRange(rearI2C);Bfn=1;}}else{Bsz = Wire.requestFrom(rearI2C, byte(2));}                
-                //if ((Csz==2)){if(Cfn==0){rangeC = readRange(leftI2C);Cfn=1;}}else{Csz = Wire.requestFrom(leftI2C, byte(2));}
-                //if ((Dsz==2)){if(Dfn==0){rangeD = readRange(rightI2C);Dfn=1;}}else{Dsz = Wire.requestFrom(rightI2C, byte(2));}
-        }          
-        if (Afn){rangeA = readRange(frontI2C);}  
-        if (Bfn){rangeB = readRange(rearI2C);}
-        //if (Cfn){rangeC = readRange(leftI2C);}
-        //if (Dfn){rangeD = readRange(rightI2C);}
-        //Serial.print(" info:");Serial.print(Asz);Serial.print(Bsz);//Serial.println(Csz);
+  Afn=0;
+  Bfn=0;
+  Cfn=0;
+  Dfn=0;
+  Asz=0;
+  Bsz=0;
+  Csz=0;
+  Dsz=0;        
+  rangeA=1000;
+  rangeB=1000;
+  rangeC=1000;
+  rangeD=1000;
+
+  int timeout=millis()+PIDSampleTime;
+  //(Afn!=1)and(Bfn!=1)and(Cfn!=1)
+  while ((1==1)and(timeout>millis())) {                
+    if ((Asz==2)){
+      if(Afn==0){
+        rangeA = readRange(frontI2C);
+        Afn=1;
+      }
+    }
+    else{
+      Asz = Wire.requestFrom(frontI2C, byte(2));
+    }               
+    if ((Bsz==2)){
+      if(Bfn==0){
+        rangeB = readRange(rearI2C);
+        Bfn=1;
+      }
+    }
+    else{
+      Bsz = Wire.requestFrom(rearI2C, byte(2));
+    }                
+    //if ((Csz==2)){if(Cfn==0){rangeC = readRange(leftI2C);Cfn=1;}}else{Csz = Wire.requestFrom(leftI2C, byte(2));}
+    //if ((Dsz==2)){if(Dfn==0){rangeD = readRange(rightI2C);Dfn=1;}}else{Dsz = Wire.requestFrom(rightI2C, byte(2));}
+  }          
+  if (Afn){
+    rangeA = readRange(frontI2C);
+  }  
+  if (Bfn){
+    rangeB = readRange(rearI2C);
+  }
+  //if (Cfn){rangeC = readRange(leftI2C);}
+  //if (Dfn){rangeD = readRange(rightI2C);}
+  //Serial.print(" info:");Serial.print(Asz);Serial.print(Bsz);//Serial.println(Csz);
 }
 
 //Meguno Link
@@ -165,18 +186,18 @@ void readSpektrum(){
 void setup() {
   Serial.begin(57600);
   //Serial1.begin(115200); //Spektrum serial
-  
+
   PPMout.begin(5);
   PPMin.begin(6);
 
   Wire.begin(I2C_MASTER, 0,0, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_100); //Initiate Wire library for I2C communications with I2CXL‑MaxSonar‑EZ
-  
+
   //Initiate sonar ranging ready for 1st loop
-    sortOutI2C();
-    takeRangeReading(frontI2C);
-    takeRangeReading(rearI2C);
-    //takeRangeReading(leftI2C);
-    //takeRangeReading(rightI2C);
+  sortOutI2C();
+  takeRangeReading(frontI2C);
+  takeRangeReading(rearI2C);
+  //takeRangeReading(leftI2C);
+  //takeRangeReading(rightI2C);
 
   //Initialise PID loops
   Setpoint_right= Setpoint_front = Setpoint_left = Setpoint_rear = safe_distance;
@@ -220,11 +241,11 @@ void report(){
   Serial.print(F("{TIMEPLOT:PID|data|Output_right|T|"));
   Serial.print(Output_right);
   Serial.print(F("}"));
-  
+
   Serial.print(F("{TIMEPLOT:PID|data|Output_front|T|"));
   Serial.print(Output_front);
   Serial.print(F("}"));
-  
+
   Serial.print(F("{TIMEPLOT:PID|data|Output_rear|T|"));
   Serial.print(Output_rear);
   Serial.print(F("}"));
@@ -256,7 +277,7 @@ void report(){
   Serial.print(F("{TIMEPLOT:PID|data|AileronOut|T|"));
   Serial.print(compd_roll);
   Serial.print(F("}"));
-  
+
   Serial.print(F("{TIMEPLOT:PID|data|ElevonOut|T|"));
   Serial.print(compd_pitch);
   Serial.print(F("}"));
@@ -264,15 +285,15 @@ void report(){
   Serial.print(F("{TIMEPLOT:RC|data|Aileron|T|"));
   Serial.print(roll_in);
   Serial.println(F("}"));
-  
+
   Serial.print(F("{TIMEPLOT:RC|data|Elevon|T|"));
   Serial.print(pitch_in);
   Serial.println(F("}"));
-  
+
   Serial.print(F("{TIMEPLOT:RC|data|Rudder|T|"));
   Serial.print(yaw_in);
   Serial.println(F("}"));
-  
+
   Serial.print(F("{TIMEPLOT:RC|data|throttle|T|"));
   Serial.print(throttle_in);
   Serial.println(F("}"));
@@ -280,12 +301,12 @@ void report(){
   Serial.print(F("{TIMEPLOT:RC|data|Mode|T|"));
   Serial.print(mode_switch);
   Serial.println(F("}"));
-  
-   Serial.print(F("{TIMEPLOT:RC|data|Aux1|T|"));
-   Serial.print(aux1);
-   Serial.println(F("}"));
-   
-   /*Serial.print(F("{TIMEPLOT:PIDsettings|data|Kd|T|"));
+
+  Serial.print(F("{TIMEPLOT:RC|data|Aux1|T|"));
+  Serial.print(aux1);
+  Serial.println(F("}"));
+
+  /*Serial.print(F("{TIMEPLOT:PIDsettings|data|Kd|T|"));
    Serial.print(PID_right.GetKd());
    Serial.println(F("}"));
    
@@ -300,7 +321,7 @@ void report(){
    Serial.print(F("{TIMEPLOT:Variables|data|millis()|T|"));
    Serial.print(millis());
    Serial.println(F("}"));
-
+   
    Serial.print(F("{TIMEPLOT:Variables|data|tmp_time|T|"));
    Serial.print(tmp_time);
    Serial.println(F("}"));
@@ -320,40 +341,17 @@ void report(){
   //Serial.print(" \n");
 
 }
-
-void workloop(){
-  work_time = millis();
-
-  //Refresh sensor readings
-    sortOutI2C();
-    front_sonar= rangeA;  //read I2C sonar range, Value in cm
-    rear_sonar= rangeB; //read I2C sonar range, Value in cm
-    //left_sonar= rangeC; //read I2C sonar range, Value in cm
-    //right_sonar= rangeD; //read I2C sonar range, Value in cm
-
+void RC(){
+  RC_time = millis();
   //Refresh RC inputs  
   //readSpektrum();  
-    readPPM();
-    pitch_in=channel[4];
-    roll_in=channel[2];
-    throttle_in=channel[3];
-    yaw_in=channel[1];
-    mode_switch=channel[5];
-    aux1=channel[6];
-   
-  //Run PID loops
-  PID_rear.Compute();
-  PID_right.Compute();
-  PID_front.Compute();
-  PID_left.Compute();
-  
-
-  //Start next ranging cycle
-    takeRangeReading(frontI2C);
-    takeRangeReading(rearI2C);
-    //takeRangeReading(leftI2C);
-    //takeRangeReading(rightI2C);
-
+  readPPM();
+  pitch_in=channel[4];
+  roll_in=channel[2];
+  throttle_in=channel[3];
+  yaw_in=channel[1];
+  mode_switch=channel[5];
+  aux1=channel[6];
 
   //Do we want obstacle avoidance on?
   if(aux1>1400){
@@ -373,18 +371,45 @@ void workloop(){
   writePPM();
 }
 
+void workloop(){
+  work_time = millis();
+
+  //Refresh sensor readings
+  sortOutI2C();
+  front_sonar= rangeA;  //read I2C sonar range, Value in cm
+  rear_sonar= rangeB; //read I2C sonar range, Value in cm
+  //left_sonar= rangeC; //read I2C sonar range, Value in cm
+  //right_sonar= rangeD; //read I2C sonar range, Value in cm
+
+  //Run PID loops
+  PID_rear.Compute();
+  PID_right.Compute();
+  PID_front.Compute();
+  PID_left.Compute();
+
+  //Start next ranging cycle
+  takeRangeReading(frontI2C);
+  takeRangeReading(rearI2C);
+  //takeRangeReading(leftI2C);
+  //takeRangeReading(rightI2C);
+}
+
 
 void loop() {
   tmp_time=millis();
 
-  if (tmp_time  >report_time+ 66){
+  if (tmp_time  >report_time+ 100){
     report();
   } 
   if (tmp_time  >work_time + PIDSampleTime){
     workloop();
   }
+  //if (tmp_time  >RC_time + 10){
+    RC();
+  //}
 
 }
+
 
 
 
