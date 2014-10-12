@@ -107,8 +107,24 @@ void sortOutI2C(){
     else{
       Bsz = Wire.requestFrom(rearI2C, byte(2));
     }                
-    //if ((Csz==2)){if(Cfn==0){rangeC = readRange(leftI2C);Cfn=1;}}else{Csz = Wire.requestFrom(leftI2C, byte(2));}
-    //if ((Dsz==2)){if(Dfn==0){rangeD = readRange(rightI2C);Dfn=1;}}else{Dsz = Wire.requestFrom(rightI2C, byte(2));}
+    if ((Csz==2)){
+      if(Cfn==0){
+        rangeC = readRange(leftI2C);
+        Cfn=1;
+      }
+    }
+    else{
+      Csz = Wire.requestFrom(leftI2C, byte(2));
+    }
+    if ((Dsz==2)){
+      if(Dfn==0){
+        rangeD = readRange(rightI2C);
+        Dfn=1;
+      }
+    }
+    else{
+      Dsz = Wire.requestFrom(rightI2C, byte(2));
+    }
   }          
   if (Afn){
     rangeA = readRange(frontI2C);
@@ -116,8 +132,12 @@ void sortOutI2C(){
   if (Bfn){
     rangeB = readRange(rearI2C);
   }
-  //if (Cfn){rangeC = readRange(leftI2C);}
-  //if (Dfn){rangeD = readRange(rightI2C);}
+  if (Cfn){
+    rangeC = readRange(leftI2C);
+  }
+  if (Dfn){
+    rangeD = readRange(rightI2C);
+  }
   //Serial.print(" info:");Serial.print(Asz);Serial.print(Bsz);//Serial.println(Csz);
 }
 
@@ -168,23 +188,23 @@ void writePPM(){
   PPMout.write(8, gear);
 }
 
-#include "SatelliteReceiver.h"
-SatelliteReceiver Rx;
-
-void readSpektrum(){
-  Rx.getFrame();
-  //roll_in=Rx.getAile();
-  //pitch_in=Rx.getElev();
-  //throttle_in=Rx.getThro();
-  //yaw_in=Rx.getRudd();
-  //mode_switch=Rx.getFlap();
-  //aux1= Rx.getGear();
-  aux2= Rx.getAux2();
-}
-
+/*#include "SatelliteReceiver.h"
+ SatelliteReceiver Rx;
+ 
+ void readSpektrum(){
+ Rx.getFrame();
+ //roll_in=Rx.getAile();
+ //pitch_in=Rx.getElev();
+ //throttle_in=Rx.getThro();
+ //yaw_in=Rx.getRudd();
+ //mode_switch=Rx.getFlap();
+ //aux1= Rx.getGear();
+ aux2= Rx.getAux2();
+ }
+ */
 
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(115200);
   //Serial1.begin(115200); //Spektrum serial
 
   PPMout.begin(5);
@@ -196,8 +216,8 @@ void setup() {
   sortOutI2C();
   takeRangeReading(frontI2C);
   takeRangeReading(rearI2C);
-  //takeRangeReading(leftI2C);
-  //takeRangeReading(rightI2C);
+  takeRangeReading(leftI2C);
+  takeRangeReading(rightI2C);
 
   //Initialise PID loops
   Setpoint_right= Setpoint_front = Setpoint_left = Setpoint_rear = safe_distance;
@@ -378,8 +398,8 @@ void workloop(){
   sortOutI2C();
   front_sonar= rangeA;  //read I2C sonar range, Value in cm
   rear_sonar= rangeB; //read I2C sonar range, Value in cm
-  //left_sonar= rangeC; //read I2C sonar range, Value in cm
-  //right_sonar= rangeD; //read I2C sonar range, Value in cm
+  left_sonar= rangeC; //read I2C sonar range, Value in cm
+  right_sonar= rangeD; //read I2C sonar range, Value in cm
 
   //Run PID loops
   PID_rear.Compute();
@@ -390,8 +410,8 @@ void workloop(){
   //Start next ranging cycle
   takeRangeReading(frontI2C);
   takeRangeReading(rearI2C);
-  //takeRangeReading(leftI2C);
-  //takeRangeReading(rightI2C);
+  takeRangeReading(leftI2C);
+  takeRangeReading(rightI2C);
 }
 
 
@@ -404,11 +424,13 @@ void loop() {
   if (tmp_time  >work_time + PIDSampleTime){
     workloop();
   }
-  //if (tmp_time  >RC_time + 10){
-    RC();
-  //}
+  if (tmp_time  >RC_time + 10){
+  RC();
+  }
 
 }
+
+
 
 
 
