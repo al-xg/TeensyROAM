@@ -1,3 +1,5 @@
+//#include <PID_v1.h>
+
 unsigned long report_time;
 unsigned long work_time;
 unsigned long RC_time;
@@ -5,13 +7,14 @@ unsigned long tmp_time;
 
 #include "PID_ROAM.h"
 
+
 //Define Variables we'll be connecting to
-double Setpoint_right, right_sonar=100, Output_right=0;
-double Setpoint_front, front_sonar=100, Output_front=0;
-double Setpoint_left, left_sonar=100, Output_left=0;
-double Setpoint_rear, rear_sonar=100, Output_rear=0;
-const double PIDSampleTime=68; //interval in ms
-const double safe_distance=25; //value in cm
+double Setpoint_right, right_sonar=1000, Output_right=0;
+double Setpoint_front, front_sonar=1000, Output_front=0;
+double Setpoint_left, left_sonar=1000, Output_left=0;
+double Setpoint_rear, rear_sonar=1000, Output_rear=0;
+const double PIDSampleTime=100; //interval in ms
+const double safe_distance=50; //value in cm
 const double OutMax=600; //value in ms
 const double P=7;
 const double I=3;
@@ -26,10 +29,10 @@ PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear,P,I,D, DIRECT);
 
 #include <i2c_t3.h>
 //The Arduino Wire library uses the 7-bit version of the address, so the code example uses 0x70 instead of the 8‑bit 0xE0
-#define frontI2C byte(0x70) //A
-#define rearI2C byte(0x71)  //B
-#define leftI2C byte(0x81)  //C
-#define rightI2C byte(0x82)  //D
+#define frontI2C byte(0x81) //A
+#define rearI2C byte(0x82)  //B
+#define leftI2C byte(0x70)  //C
+#define rightI2C byte(0x71)  //D
 //The Sensor ranging command has a value of 0x51
 #define RangeCommand byte(0x51)
 
@@ -179,13 +182,13 @@ void readPPM(){
 
 void writePPM(){
   PPMout.write(3, compd_throttle);
-  PPMout.write(4, compd_pitch);
-  PPMout.write(2, compd_roll);
-  PPMout.write(1, yaw_in);
+  PPMout.write(2, compd_pitch);
+  PPMout.write(1, compd_roll);
+  PPMout.write(4, yaw_in);
   PPMout.write(5, mode_switch);
   PPMout.write(6, aux1);
-  PPMout.write(7, aux2);
-  PPMout.write(8, gear);
+  //PPMout.write(7, aux2);
+  //PPMout.write(8, gear);
 }
 
 /*#include "SatelliteReceiver.h"
@@ -366,10 +369,10 @@ void RC(){
   //Refresh RC inputs  
   //readSpektrum();  
   readPPM();
-  pitch_in=channel[4];
-  roll_in=channel[2];
+  pitch_in=channel[2];
+  roll_in=channel[1];
   throttle_in=channel[3];
-  yaw_in=channel[1];
+  yaw_in=channel[4];
   mode_switch=channel[5];
   aux1=channel[6];
 
@@ -377,8 +380,8 @@ void RC(){
   if(aux1>1400){
     compd_roll=(roll_in-int(Output_right)+int(Output_left));
     compd_pitch=(pitch_in-int(Output_rear)+int(Output_front)); //remember to check the direction of pitch before testing
-    compd_roll=ConstrainPWM(compd_roll,1100,1950);
-    compd_pitch=ConstrainPWM(compd_pitch,1100,1950);
+    //compd_roll=ConstrainPWM(compd_roll,1100,1950);
+    //compd_pitch=ConstrainPWM(compd_pitch,1100,1950);
     compd_throttle=throttle_in;
   }
   else {
@@ -398,14 +401,16 @@ void workloop(){
   sortOutI2C();
   front_sonar= rangeA;  //read I2C sonar range, Value in cm
   rear_sonar= rangeB; //read I2C sonar range, Value in cm
-  left_sonar= rangeC; //read I2C sonar range, Value in cm
+  left_sonar= rangeC;//rangeC; //read I2C sonar range, Value in cm
   right_sonar= rangeD; //read I2C sonar range, Value in cm
 
   //Run PID loops
+  
   PID_rear.Compute();
+  PID_left.Compute();
   PID_right.Compute();
   PID_front.Compute();
-  PID_left.Compute();
+
 
   //Start next ranging cycle
   takeRangeReading(frontI2C);
