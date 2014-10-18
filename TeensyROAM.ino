@@ -13,7 +13,7 @@ double Setpoint_right, right_sonar=1000, Output_right=0;
 double Setpoint_front, front_sonar=1000, Output_front=0;
 double Setpoint_left, left_sonar=1000, Output_left=0;
 double Setpoint_rear, rear_sonar=1000, Output_rear=0;
-const double PIDSampleTime=100; //interval in ms
+const double PIDSampleTime=68; //interval in ms
 const double safe_distance=50; //value in cm
 const double OutMax=600; //value in ms
 const double P=7;
@@ -54,7 +54,8 @@ size_t Dsz=0;
 void takeRangeReading(byte Address){
   Wire.beginTransmission(Address);             //Start addressing 
   Wire.write(RangeCommand);                             //send range command 
-  Wire.endTransmission(I2C_STOP);                                  //Stop and do something else now
+  Wire.sendTransmission(I2C_STOP);                                  //Stop and do something else now
+  Wire.finish();
 }    
 
 //Returns the last range that the sensor determined in its last ranging cycle in centimeters. Returns 0 if there is no communication. 
@@ -90,7 +91,6 @@ void sortOutI2C(){
   rangeD=1000;
 
   int timeout=millis()+PIDSampleTime;
-  //(Afn!=1)and(Bfn!=1)and(Cfn!=1)
   while ((1==1)and(timeout>millis())) {                
     if ((Asz==2)){
       if(Afn==0){
@@ -141,13 +141,12 @@ void sortOutI2C(){
   if (Dfn){
     rangeD = readRange(rightI2C);
   }
-  //Serial.print(" info:");Serial.print(Asz);Serial.print(Bsz);//Serial.println(Csz);
 }
 
 //Meguno Link
 char channelName[ ] = "debug";
 
-#include <PulsePosition.h>
+#include "PulsePosition.h"
 
 PulsePositionOutput PPMout;
 PulsePositionInput PPMin;
@@ -187,31 +186,32 @@ void writePPM(){
   PPMout.write(4, yaw_in);
   PPMout.write(5, mode_switch);
   PPMout.write(6, aux1);
-  //PPMout.write(7, aux2);
-  //PPMout.write(8, gear);
+  PPMout.write(7, aux2);
+  PPMout.write(8, gear);
 }
 
-/*#include "SatelliteReceiver.h"
+#include "SatelliteReceiver.h"
  SatelliteReceiver Rx;
  
  void readSpektrum(){
  Rx.getFrame();
- //roll_in=Rx.getAile();
- //pitch_in=Rx.getElev();
- //throttle_in=Rx.getThro();
- //yaw_in=Rx.getRudd();
- //mode_switch=Rx.getFlap();
- //aux1= Rx.getGear();
+ roll_in=Rx.getAile();
+ pitch_in=Rx.getElev();
+ throttle_in=Rx.getThro();
+ yaw_in=Rx.getRudd();
+ mode_switch=Rx.getFlap();
+ aux1= Rx.getGear();
  aux2= Rx.getAux2();
  }
- */
 
 void setup() {
   Serial.begin(115200);
   //Serial1.begin(115200); //Spektrum serial
 
   PPMout.begin(5);
+  PulsePositionInput PPMout(RISING);
   PPMin.begin(6);
+  PulsePositionInput PPMin(RISING);
 
   Wire.begin(I2C_MASTER, 0,0, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_100); //Initiate Wire library for I2C communications with I2CXL‑MaxSonar‑EZ
 
@@ -240,8 +240,8 @@ void setup() {
   PID_rear.SetMode(AUTOMATIC);
   PID_rear.SetSampleTime(PIDSampleTime);
   PID_rear.SetOutputLimits(0,OutMax);
+    
   //pinMode(piezzo,OUTPUT); //Buzzer for PID output, find unused pin
-
 
   //Intialise loop timers
   report_time	= millis();
@@ -250,13 +250,11 @@ void setup() {
 
 void buzzer(){
   //buzzer
-  /*
-     if (aux2>1600){
+  /*   if (aux2>1600){
    if(right_sonar<(Setpoint_right+20)) analogWrite(piezzo,Output_right);
    else analogWrite(piezzo,0);
    }
-   else analogWrite(piezzo,0);
-   */
+   else analogWrite(piezzo,0);*/
 }
 
 void report(){
@@ -377,18 +375,18 @@ void RC(){
   aux1=channel[6];
 
   //Do we want obstacle avoidance on?
-  if(aux1>1400){
+ /* if(aux1>1400){
     compd_roll=(roll_in-int(Output_right)+int(Output_left));
-    compd_pitch=(pitch_in-int(Output_rear)+int(Output_front)); //remember to check the direction of pitch before testing
-    //compd_roll=ConstrainPWM(compd_roll,1100,1950);
-    //compd_pitch=ConstrainPWM(compd_pitch,1100,1950);
+    compd_pitch=(pitch_in-int(Output_rear)+int(Output_front));
+    compd_roll=ConstrainPWM(compd_roll,1100,1950);
+    compd_pitch=ConstrainPWM(compd_pitch,1100,1950);
     compd_throttle=throttle_in;
   }
-  else {
+  else {*/
     compd_roll=roll_in;
     compd_pitch=pitch_in;
     compd_throttle=throttle_in;
-  }
+  //}
 
   //buzzer();
   writePPM();
@@ -399,8 +397,8 @@ void workloop(){
 
   //Refresh sensor readings
   sortOutI2C();
-  front_sonar= rangeA;  //read I2C sonar range, Value in cm
-  rear_sonar= rangeB; //read I2C sonar range, Value in cm
+  //front_sonar= rangeA;  //read I2C sonar range, Value in cm
+  //rear_sonar= rangeB; //read I2C sonar range, Value in cm
   left_sonar= rangeC;//rangeC; //read I2C sonar range, Value in cm
   right_sonar= rangeD; //read I2C sonar range, Value in cm
 
@@ -413,8 +411,8 @@ void workloop(){
 
 
   //Start next ranging cycle
-  takeRangeReading(frontI2C);
-  takeRangeReading(rearI2C);
+  //takeRangeReading(frontI2C);
+  //takeRangeReading(rearI2C);
   takeRangeReading(leftI2C);
   takeRangeReading(rightI2C);
 }
@@ -429,7 +427,7 @@ void loop() {
   if (tmp_time  >work_time + PIDSampleTime){
     workloop();
   }
-  if (tmp_time  >RC_time + 10){
+  if (tmp_time  >RC_time + 20){
   RC();
   }
 
