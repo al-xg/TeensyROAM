@@ -13,7 +13,7 @@ double Setpoint_right, right_sonar=1000, Output_right=0;
 double Setpoint_front, front_sonar=1000, Output_front=0;
 double Setpoint_left, left_sonar=1000, Output_left=0;
 double Setpoint_rear, rear_sonar=1000, Output_rear=0;
-const double PIDSampleTime=68; //interval in ms
+const double PIDSampleTime=100; //Interval in ms
 const double safe_distance=50; //value in cm
 const double OutMax=600; //value in ms
 const double P=7;
@@ -90,8 +90,8 @@ void sortOutI2C(){
   rangeC=1000;
   rangeD=1000;
 
-  int timeout=millis()+PIDSampleTime;
-  while ((1==1)and(timeout>millis())) {                
+  int timeout=millis()+ 1;//PIDSampleTime;
+  while ((Afn!=1&Bfn!=1&Cfn!=1&Dfn!=1)&(timeout>millis())) {                
     if ((Asz==2)){
       if(Afn==0){
         rangeA = readRange(frontI2C);
@@ -129,7 +129,7 @@ void sortOutI2C(){
       Dsz = Wire.requestFrom(rightI2C, byte(2));
     }
   }          
-  if (Afn){
+ if (Afn){
     rangeA = readRange(frontI2C);
   }  
   if (Bfn){
@@ -217,8 +217,8 @@ void setup() {
 
   //Initiate sonar ranging ready for 1st loop
   sortOutI2C();
-  takeRangeReading(frontI2C);
-  takeRangeReading(rearI2C);
+  //takeRangeReading(frontI2C);
+  //takeRangeReading(rearI2C);
   takeRangeReading(leftI2C);
   takeRangeReading(rightI2C);
 
@@ -246,6 +246,7 @@ void setup() {
   //Intialise loop timers
   report_time	= millis();
   work_time	= millis();
+  RC_time  = millis();
 }
 
 void buzzer(){
@@ -366,8 +367,12 @@ void RC(){
   RC_time = millis();
   //Refresh RC inputs  
   //readSpektrum();  
-  readPPM();
-  pitch_in=channel[2];
+  int i, numCh;
+  numCh = PPMin.available();
+  if (numCh > 0) {
+    for (i=1; i <= numCh; i++) {
+      channel[i]= PPMin.read(i);
+      pitch_in=channel[2];
   roll_in=channel[1];
   throttle_in=channel[3];
   yaw_in=channel[4];
@@ -375,21 +380,23 @@ void RC(){
   aux1=channel[6];
 
   //Do we want obstacle avoidance on?
- /* if(aux1>1400){
+ if(aux1>1400){
     compd_roll=(roll_in-int(Output_right)+int(Output_left));
     compd_pitch=(pitch_in-int(Output_rear)+int(Output_front));
     compd_roll=ConstrainPWM(compd_roll,1100,1950);
     compd_pitch=ConstrainPWM(compd_pitch,1100,1950);
     compd_throttle=throttle_in;
   }
-  else {*/
+  else {
     compd_roll=roll_in;
     compd_pitch=pitch_in;
     compd_throttle=throttle_in;
-  //}
+  }
 
   //buzzer();
   writePPM();
+    }
+  }
 }
 
 void workloop(){
@@ -399,15 +406,15 @@ void workloop(){
   sortOutI2C();
   //front_sonar= rangeA;  //read I2C sonar range, Value in cm
   //rear_sonar= rangeB; //read I2C sonar range, Value in cm
-  left_sonar= rangeC;//rangeC; //read I2C sonar range, Value in cm
+  left_sonar= rangeC; //read I2C sonar range, Value in cm
   right_sonar= rangeD; //read I2C sonar range, Value in cm
 
   //Run PID loops
   
-  PID_rear.Compute();
+  //PID_rear.Compute();
   PID_left.Compute();
   PID_right.Compute();
-  PID_front.Compute();
+  //PID_front.Compute();
 
 
   //Start next ranging cycle
@@ -415,19 +422,19 @@ void workloop(){
   //takeRangeReading(rearI2C);
   takeRangeReading(leftI2C);
   takeRangeReading(rightI2C);
-}
+  }
 
 
 void loop() {
   tmp_time=millis();
 
-  if (tmp_time  >report_time+ 100){
+  if (tmp_time  >report_time+ 10){
     report();
-  } 
-  if (tmp_time  >work_time + PIDSampleTime){
+  }
+ if(tmp_time  >work_time + PIDSampleTime){
     workloop();
   }
-  if (tmp_time  >RC_time + 20){
+  if (tmp_time  >RC_time + 10){
   RC();
   }
 
