@@ -1,0 +1,452 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<meguno-link-project version="1.0">
+  <culture>en-GB</culture>
+  <policies>
+    <enable>false</enable>
+    <protect>false</protect>
+    <application>
+      <allow-tool-setup>true</allow-tool-setup>
+      <allow-reporting>true</allow-reporting>
+      <title-text />
+    </application>
+    <visualizers>
+      <allow-creation>true</allow-creation>
+      <allow-close>true</allow-close>
+      <allow-source-selection>true</allow-source-selection>
+      <allow-channel-selection>true</allow-channel-selection>
+      <custom>
+        <policy id="DataTable">
+          <allow-source-selection>Inherit</allow-source-selection>
+          <allow-channel-selection>Inherit</allow-channel-selection>
+          <allow-send>true</allow-send>
+        </policy>
+        <policy id="FileWriter">
+          <allow-source-selection>Inherit</allow-source-selection>
+          <allow-channel-selection>Inherit</allow-channel-selection>
+          <allow-path-change>true</allow-path-change>
+          <allow-edit-timestamp>true</allow-edit-timestamp>
+        </policy>
+        <policy id="LogToFile">
+          <allow-source-selection>Inherit</allow-source-selection>
+          <allow-channel-selection>Inherit</allow-channel-selection>
+          <allow-path-change>true</allow-path-change>
+          <allow-edit-timestamp>true</allow-edit-timestamp>
+        </policy>
+        <policy id="MessageStreamViewer">
+          <allow-source-selection>Inherit</allow-source-selection>
+          <allow-channel-selection>Inherit</allow-channel-selection>
+          <allow-send>true</allow-send>
+          <allow-edit-wordwrap>true</allow-edit-wordwrap>
+          <allow-edit-timestamp>true</allow-edit-timestamp>
+        </policy>
+        <policy id="SerialMonitor">
+          <allow-source-selection>Inherit</allow-source-selection>
+          <allow-channel-selection>Inherit</allow-channel-selection>
+          <allow-send>true</allow-send>
+          <allow-edit-wordwrap>true</allow-edit-wordwrap>
+          <allow-edit-timestamp>true</allow-edit-timestamp>
+        </policy>
+        <policy id="SourceManager">
+          <allow-source-selection>Inherit</allow-source-selection>
+          <allow-channel-selection>Inherit</allow-channel-selection>
+          <allow-edit-baud>true</allow-edit-baud>
+          <allow-edit-advanced>true</allow-edit-advanced>
+          <allow-delete>true</allow-delete>
+          <allow-edit-autoconnect>true</allow-edit-autoconnect>
+          <allow-new-source>true</allow-new-source>
+          <allow-edit-name>true</allow-edit-name>
+          <allow-reset>true</allow-reset>
+          <allow-udp-port-change>true</allow-udp-port-change>
+        </policy>
+        <policy id="InterfacePanel">
+          <allow-source-selection>Inherit</allow-source-selection>
+          <allow-channel-selection>Inherit</allow-channel-selection>
+          <allow-designer>true</allow-designer>
+        </policy>
+        <policy id="mlpChart">
+          <allow-source-selection>Inherit</allow-source-selection>
+          <allow-channel-selection>Inherit</allow-channel-selection>
+          <allow-edit-properties>true</allow-edit-properties>
+          <allow-edit-series-properties>true</allow-edit-series-properties>
+        </policy>
+        <policy id="ScatterPlotter">
+          <allow-source-selection>Inherit</allow-source-selection>
+          <allow-channel-selection>Inherit</allow-channel-selection>
+          <allow-edit-properties>true</allow-edit-properties>
+          <allow-edit-series-properties>true</allow-edit-series-properties>
+        </policy>
+      </custom>
+    </visualizers>
+  </policies>
+  <data>
+    <properties>
+      <title />
+      <description />
+      <image-48 />
+    </properties>
+    <shared-visualizer-data>
+      <data id="DefaultPlotConfigurationData">
+        <show-summary-table>false</show-summary-table>
+        <show-legend>true</show-legend>
+        <default-symbol-size>4</default-symbol-size>
+        <default-line-width>1</default-line-width>
+        <default-dash-style>Solid</default-dash-style>
+        <default-visibility>true</default-visibility>
+        <next-color>1</next-color>
+        <next-symbol>5</next-symbol>
+        <series-styles>
+          <style name="Aileron">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>DeepPink</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Circle</SymbolType>
+              <SymbolColor>DeepPink</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="Elevon">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Red</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Diamond</SymbolType>
+              <SymbolColor>Red</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="Rudder">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Lime</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>HDash</SymbolType>
+              <SymbolColor>Lime</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="throttle">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Blue</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Plus</SymbolType>
+              <SymbolColor>Blue</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="Mode">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Black</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Square</SymbolType>
+              <SymbolColor>Black</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="Aux1">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>LightSeaGreen</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Star</SymbolType>
+              <SymbolColor>LightSeaGreen</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="Output_right">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Cyan</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Circle</SymbolType>
+              <SymbolColor>Cyan</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="Output_front">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Gray</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Diamond</SymbolType>
+              <SymbolColor>Gray</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="Output_rear">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>DeepPink</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>HDash</SymbolType>
+              <SymbolColor>DeepPink</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="Output_left">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Red</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Plus</SymbolType>
+              <SymbolColor>Red</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="safe_distance">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Lime</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Square</SymbolType>
+              <SymbolColor>Lime</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="RightSonar">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Blue</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Star</SymbolType>
+              <SymbolColor>Blue</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="FrontSonar">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Black</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Circle</SymbolType>
+              <SymbolColor>Black</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="RearSonar">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>LightSeaGreen</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Diamond</SymbolType>
+              <SymbolColor>LightSeaGreen</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="LeftSonar">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Cyan</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>HDash</SymbolType>
+              <SymbolColor>Cyan</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="AileronOut">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>Gray</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Plus</SymbolType>
+              <SymbolColor>Gray</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+          <style name="ElevonOut">
+            <SeriesStyle xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <LineStyle>Solid</LineStyle>
+              <LineColor>DeepPink</LineColor>
+              <LineWidth>1</LineWidth>
+              <SymbolType>Square</SymbolType>
+              <SymbolColor>DeepPink</SymbolColor>
+              <SymbolSize>4</SymbolSize>
+              <Visible>true</Visible>
+            </SeriesStyle>
+          </style>
+        </series-styles>
+      </data>
+    </shared-visualizer-data>
+  </data>
+  <serial-sources>
+    <default>1</default>
+    <sources>
+      <source type="SharedRS232Port">
+        <id>1</id>
+        <is-programmer>true</is-programmer>
+        <display-name>RS232 1</display-name>
+        <auto-connect>false</auto-connect>
+        <port-name>
+          <type>Fixed</type>
+          <port>COM9</port>
+        </port-name>
+        <baud-rate>115200</baud-rate>
+        <data-bits>8</data-bits>
+        <handshaking>None</handshaking>
+        <parity>None</parity>
+        <stop-bits>One</stop-bits>
+      </source>
+    </sources>
+  </serial-sources>
+  <windows>
+    <window>
+      <position left="-8" top="-8" width="1382" height="754" state="Maximized" />
+      <DockPanel FormatVersion="1.0" DockLeftPortion="0.25" DockRightPortion="220" DockTopPortion="0.25" DockBottomPortion="0.25" ActiveDocumentPane="1" ActivePane="1">
+        <Contents Count="4">
+          <Content ID="0" PersistString="VisualizerToolbox" AutoHidePortion="220" IsHidden="False" IsFloat="False" />
+          <Content ID="1" PersistString="Startup" AutoHidePortion="0.25" IsHidden="False" IsFloat="False">
+            <ShowSourceInTitle>true</ShowSourceInTitle>
+            <ShowPortInTitle>false</ShowPortInTitle>
+            <SourceId>-1</SourceId>
+            <TabTitle>Startup</TabTitle>
+          </Content>
+          <Content ID="2" PersistString="SourceManager" AutoHidePortion="0.25" IsHidden="False" IsFloat="False">
+            <ShowSourceInTitle>true</ShowSourceInTitle>
+            <ShowPortInTitle>false</ShowPortInTitle>
+            <SourceId>-1</SourceId>
+            <TabTitle>Connection Manager</TabTitle>
+          </Content>
+          <Content ID="3" PersistString="mlpChart" AutoHidePortion="0.25" IsHidden="False" IsFloat="False">
+            <ShowSourceInTitle>true</ShowSourceInTitle>
+            <ShowPortInTitle>false</ShowPortInTitle>
+            <SourceId>1</SourceId>
+            <TabTitle>Time Plot</TabTitle>
+            <reporting-enabled>false</reporting-enabled>
+            <show-summary>false</show-summary>
+            <active-channels>PID</active-channels>
+            <reporting>
+              <width>640</width>
+              <height>480</height>
+              <dpi>96</dpi>
+              <anti-alias>true</anti-alias>
+              <filename-pattern>Graph {Seq}</filename-pattern>
+              <format>b96b3caf-0728-11d3-9d7b-0000f81ef32e</format>
+            </reporting>
+            <title>
+              <text>Chart</text>
+              <visible>true</visible>
+              <font>
+                <color>-16777216</color>
+                <family>Microsoft Sans Serif</family>
+                <bold>true</bold>
+                <italic>false</italic>
+                <size>16</size>
+              </font>
+            </title>
+            <x-axis>
+              <minimum>42075.921666666865</minimum>
+              <maximum>42075.922870370559</maximum>
+              <major-step>15</major-step>
+              <minor-step>5</minor-step>
+              <major-unit>Second</major-unit>
+              <minor-unit>Second</minor-unit>
+              <minimum-auto>true</minimum-auto>
+              <maximum-auto>true</maximum-auto>
+              <major-step-auto>true</major-step-auto>
+              <minor-step-auto>true</minor-step-auto>
+              <text>Time</text>
+              <visible>true</visible>
+              <font>
+                <color>-16777216</color>
+                <family>Microsoft Sans Serif</family>
+                <bold>true</bold>
+                <italic>false</italic>
+                <size>14</size>
+              </font>
+            </x-axis>
+            <y-axis>
+              <minimum>0</minimum>
+              <maximum>1800</maximum>
+              <major-step>200</major-step>
+              <minor-step>50</minor-step>
+              <major-unit>Day</major-unit>
+              <minor-unit>Day</minor-unit>
+              <minimum-auto>true</minimum-auto>
+              <maximum-auto>true</maximum-auto>
+              <major-step-auto>true</major-step-auto>
+              <minor-step-auto>true</minor-step-auto>
+              <text>y</text>
+              <visible>true</visible>
+              <font>
+                <color>-16777216</color>
+                <family>Microsoft Sans Serif</family>
+                <bold>true</bold>
+                <italic>false</italic>
+                <size>14</size>
+              </font>
+            </y-axis>
+            <run>false</run>
+          </Content>
+        </Contents>
+        <Panes Count="2">
+          <Pane ID="0" DockState="DockRight" ActiveContent="0">
+            <Contents Count="1">
+              <Content ID="0" RefID="0" />
+            </Contents>
+          </Pane>
+          <Pane ID="1" DockState="Document" ActiveContent="3">
+            <Contents Count="3">
+              <Content ID="0" RefID="3" />
+              <Content ID="1" RefID="2" />
+              <Content ID="2" RefID="1" />
+            </Contents>
+          </Pane>
+        </Panes>
+        <DockWindows>
+          <DockWindow ID="0" DockState="Document" ZOrderIndex="0">
+            <NestedPanes Count="1">
+              <Pane ID="0" RefID="1" PrevPane="-1" Alignment="Right" Proportion="0.5" />
+            </NestedPanes>
+          </DockWindow>
+          <DockWindow ID="1" DockState="DockLeft" ZOrderIndex="2">
+            <NestedPanes Count="0" />
+          </DockWindow>
+          <DockWindow ID="2" DockState="DockRight" ZOrderIndex="3">
+            <NestedPanes Count="1">
+              <Pane ID="0" RefID="0" PrevPane="-1" Alignment="Bottom" Proportion="0.5" />
+            </NestedPanes>
+          </DockWindow>
+          <DockWindow ID="3" DockState="DockTop" ZOrderIndex="4">
+            <NestedPanes Count="0" />
+          </DockWindow>
+          <DockWindow ID="4" DockState="DockBottom" ZOrderIndex="5">
+            <NestedPanes Count="0" />
+          </DockWindow>
+        </DockWindows>
+        <FloatWindows Count="0" />
+      </DockPanel>
+    </window>
+  </windows>
+  <reporting>
+    <generate-scheduled-reports>false</generate-scheduled-reports>
+    <destinations>
+      <report-to-folder>
+        <last-report-number>0</last-report-number>
+        <folder-path>C:\Users\Alex\Documents</folder-path>
+        <use-sub-folder>true</use-sub-folder>
+        <sub-folder-pattern>Report {Seq}</sub-folder-pattern>
+        <enabled>true</enabled>
+        <period>PT1H</period>
+        <last-sent>0001-01-01T00:00:00</last-sent>
+      </report-to-folder>
+    </destinations>
+  </reporting>
+</meguno-link-project>
