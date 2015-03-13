@@ -9,12 +9,13 @@ unsigned long tmp_time;
 
 
 //Define Variables we'll be connecting to
-double Setpoint_right, right_sonar=1000, Output_right=0;
-double Setpoint_front, front_sonar=1000, Output_front=0;
-double Setpoint_left, left_sonar=1000, Output_left=0;
-double Setpoint_rear, rear_sonar=1000, Output_rear=0;
-const double PIDSampleTime=100; //Interval in ms
-const double safe_distance=50; //value in cm
+double maxRange=700;
+double Setpoint_right, right_sonar=maxRange, Output_right=0;
+double Setpoint_front, front_sonar=maxRange, Output_front=0;
+double Setpoint_left, left_sonar=maxRange, Output_left=0;
+double Setpoint_rear, rear_sonar=maxRange, Output_rear=0;
+const double PIDSampleTime=67; //Interval in ms
+const double safe_distance=35; //value in cm
 const double OutMax=600; //value in ms
 const double P=7;
 const double I=3;
@@ -36,10 +37,10 @@ PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear,P,I,D, DIRECT);
 //The Sensor ranging command has a value of 0x51
 #define RangeCommand byte(0x51)
 
-short rangeA=1000;
-short rangeB=1000;
-short rangeC=1000;
-short rangeD=1000;
+short rangeA=maxRange;
+short rangeB=maxRange;
+short rangeC=maxRange;
+short rangeD=maxRange;
 
 bool Afn=0;
 bool Bfn=0;
@@ -72,7 +73,7 @@ short readRange(byte Address){
     return range; 
   }
   else { 
-    return (short)(-1);                                             //Else nothing was received, return 0 
+    return (short)(maxRange+50);                                             //Else nothing was received, return 0 
   }
 }
 
@@ -85,10 +86,10 @@ void sortOutI2C(){
   Bsz=0;
   Csz=0;
   Dsz=0;        
-  rangeA=1000;
-  rangeB=1000;
-  rangeC=1000;
-  rangeD=1000;
+  /*rangeA=maxRange;
+  rangeB=maxRange;
+  rangeC=maxRange;
+  rangeD=maxRange;*/
 
   int timeout=millis()+ 1;//PIDSampleTime;
   while ((Afn!=1&Bfn!=1&Cfn!=1&Dfn!=1)&(timeout>millis())) {                
@@ -190,7 +191,7 @@ void writePPM(){
   PPMout.write(8, gear);
 }
 
-#include "SatelliteReceiver.h"
+/*#include "SatelliteReceiver.h"
  SatelliteReceiver Rx;
  
  void readSpektrum(){
@@ -203,14 +204,14 @@ void writePPM(){
  aux1= Rx.getGear();
  aux2= Rx.getAux2();
  }
-
+*/
 void setup() {
   Serial.begin(115200);
   //Serial1.begin(115200); //Spektrum serial
 
-  PPMout.begin(5);
+  PPMout.begin(9);
   PulsePositionInput PPMout(RISING);
-  PPMin.begin(6);
+  PPMin.begin(10);
   PulsePositionInput PPMin(RISING);
 
   Wire.begin(I2C_MASTER, 0,0, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_100); //Initiate Wire library for I2C communications with I2CXL‑MaxSonar‑EZ

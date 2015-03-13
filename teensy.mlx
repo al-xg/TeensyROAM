@@ -86,7 +86,7 @@
     </properties>
     <shared-visualizer-data>
       <data id="DefaultPlotConfigurationData">
-        <show-summary-table>false</show-summary-table>
+        <show-summary-table>true</show-summary-table>
         <show-legend>true</show-legend>
         <default-symbol-size>4</default-symbol-size>
         <default-line-width>1</default-line-width>
@@ -290,9 +290,9 @@
     <default>1</default>
     <sources>
       <source type="SharedRS232Port">
-        <id>1</id>
+        <id>3</id>
         <is-programmer>true</is-programmer>
-        <display-name>RS232 1</display-name>
+        <display-name>RS232 3</display-name>
         <auto-connect>false</auto-connect>
         <port-name>
           <type>Fixed</type>
@@ -309,7 +309,7 @@
   <windows>
     <window>
       <position left="-8" top="-8" width="1382" height="754" state="Maximized" />
-      <DockPanel FormatVersion="1.0" DockLeftPortion="0.25" DockRightPortion="220" DockTopPortion="0.25" DockBottomPortion="0.25" ActiveDocumentPane="1" ActivePane="1">
+      <DockPanel FormatVersion="1.0" DockLeftPortion="0.25" DockRightPortion="150" DockTopPortion="0.25" DockBottomPortion="0.25" ActiveDocumentPane="1" ActivePane="1">
         <Contents Count="4">
           <Content ID="0" PersistString="VisualizerToolbox" AutoHidePortion="220" IsHidden="False" IsFloat="False" />
           <Content ID="1" PersistString="Startup" AutoHidePortion="0.25" IsHidden="False" IsFloat="False">
@@ -327,10 +327,10 @@
           <Content ID="3" PersistString="mlpChart" AutoHidePortion="0.25" IsHidden="False" IsFloat="False">
             <ShowSourceInTitle>true</ShowSourceInTitle>
             <ShowPortInTitle>false</ShowPortInTitle>
-            <SourceId>1</SourceId>
+            <SourceId>3</SourceId>
             <TabTitle>Time Plot</TabTitle>
             <reporting-enabled>false</reporting-enabled>
-            <show-summary>false</show-summary>
+            <show-summary>true</show-summary>
             <active-channels>PID</active-channels>
             <reporting>
               <width>640</width>
@@ -352,14 +352,14 @@
               </font>
             </title>
             <x-axis>
-              <minimum>42075.921666666865</minimum>
-              <maximum>42075.922870370559</maximum>
-              <major-step>15</major-step>
-              <minor-step>5</minor-step>
-              <major-unit>Second</major-unit>
-              <minor-unit>Second</minor-unit>
-              <minimum-auto>true</minimum-auto>
-              <maximum-auto>true</maximum-auto>
+              <minimum>42076.026572094765</minimum>
+              <maximum>42076.026606585365</maximum>
+              <major-step>500</major-step>
+              <minor-step>100</minor-step>
+              <major-unit>Millisecond</major-unit>
+              <minor-unit>Millisecond</minor-unit>
+              <minimum-auto>false</minimum-auto>
+              <maximum-auto>false</maximum-auto>
               <major-step-auto>true</major-step-auto>
               <minor-step-auto>true</minor-step-auto>
               <text>Time</text>
@@ -374,13 +374,13 @@
             </x-axis>
             <y-axis>
               <minimum>0</minimum>
-              <maximum>1800</maximum>
-              <major-step>200</major-step>
-              <minor-step>50</minor-step>
+              <maximum>355.07648491037713</maximum>
+              <major-step>50</major-step>
+              <minor-step>10</minor-step>
               <major-unit>Day</major-unit>
               <minor-unit>Day</minor-unit>
-              <minimum-auto>true</minimum-auto>
-              <maximum-auto>true</maximum-auto>
+              <minimum-auto>false</minimum-auto>
+              <maximum-auto>false</maximum-auto>
               <major-step-auto>true</major-step-auto>
               <minor-step-auto>true</minor-step-auto>
               <text>y</text>
@@ -393,7 +393,7 @@
                 <size>14</size>
               </font>
             </y-axis>
-            <run>false</run>
+            <run>true</run>
           </Content>
         </Contents>
         <Panes Count="2">
@@ -416,18 +416,18 @@
               <Pane ID="0" RefID="1" PrevPane="-1" Alignment="Right" Proportion="0.5" />
             </NestedPanes>
           </DockWindow>
-          <DockWindow ID="1" DockState="DockLeft" ZOrderIndex="2">
+          <DockWindow ID="1" DockState="DockLeft" ZOrderIndex="1">
             <NestedPanes Count="0" />
           </DockWindow>
-          <DockWindow ID="2" DockState="DockRight" ZOrderIndex="3">
+          <DockWindow ID="2" DockState="DockRight" ZOrderIndex="2">
             <NestedPanes Count="1">
               <Pane ID="0" RefID="0" PrevPane="-1" Alignment="Bottom" Proportion="0.5" />
             </NestedPanes>
           </DockWindow>
-          <DockWindow ID="3" DockState="DockTop" ZOrderIndex="4">
+          <DockWindow ID="3" DockState="DockTop" ZOrderIndex="3">
             <NestedPanes Count="0" />
           </DockWindow>
-          <DockWindow ID="4" DockState="DockBottom" ZOrderIndex="5">
+          <DockWindow ID="4" DockState="DockBottom" ZOrderIndex="4">
             <NestedPanes Count="0" />
           </DockWindow>
         </DockWindows>
