@@ -186,9 +186,9 @@ void writePPM(){
   PPMout.write(1, compd_roll);
   PPMout.write(4, yaw_in);
   PPMout.write(5, mode_switch);
-  //PPMout.write(6, aux1);
-  //PPMout.write(7, aux2);
-  //PPMout.write(8, gear);
+  PPMout.write(6, aux1);
+  PPMout.write(7, aux2);
+  PPMout.write(8, gear);
 }
 
 /*#include "SatelliteReceiver.h"
