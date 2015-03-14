@@ -8,7 +8,7 @@ unsigned long LastActivePPM;
 unsigned long tmpPPMtime;
 
 //PID loops
-//#include "PID_ROAM.h"
+#include "PID_ROAM.h"
 //#include <PID_v1.h>
 
 double maxRange = 770; //this is the range used by the program for initialisation and when reading the sonar fails
@@ -25,44 +25,10 @@ const double I = 3;
 const double D = 0;
 
 //Specify the links and initial tuning parameters
-/*PID PID_right(&right_sonar, &Output_right, &Setpoint_right, P, I, D, DIRECT);
+PID PID_right(&right_sonar, &Output_right, &Setpoint_right, P, I, D, DIRECT);
 PID PID_front(&front_sonar, &Output_front, &Setpoint_front, P, I, D, DIRECT);
 PID PID_left(&left_sonar, &Output_left, &Setpoint_left, P, I, D, DIRECT);
-PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear, P, I, D, DIRECT);*/
-
-
-const double OutMin = 0; //value in ms
-double ITerm;
-double error;
-double left_lastInput;
-double right_lastInput;
-
-
-double SampleTimeInSec = ((double)PIDSampleTime)/1000;  
-double kp = P;
-double ki = I * SampleTimeInSec;
-double kd = D / SampleTimeInSec;
-
-double PIDCompute(double PIDinput,double PIDsetpoint, double lastInput){
-/*Compute all the working error variables*/
-	  double input = PIDinput;
-      double error = PIDsetpoint - input;
-      ITerm+= (ki * error);
-      if(ITerm > OutMax) ITerm= OutMax;
-      else if(ITerm < OutMin) ITerm= OutMin;
-      double dInput = (PIDinput - lastInput);
- 
-      /*Compute PID Output*/
-      double PIDoutput = kp * error + ITerm- kd * dInput;
-      
-	  if(PIDoutput > OutMax) PIDoutput = OutMax;
-      else if(PIDoutput < OutMin) PIDoutput = OutMin;
-	  return PIDoutput;
-	  
-	  /*Remember some variables for next time*/
-      //lastInput = input;
-}
-
+PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear, P, I, D, DIRECT);
 
 
 //I2C sonars
@@ -281,7 +247,7 @@ void setup() {
   //Initialise PID loops
   Setpoint_right = Setpoint_front = Setpoint_left = Setpoint_rear = safe_distance;
 
-  /*PID_right.SetMode(AUTOMATIC);
+  PID_right.SetMode(AUTOMATIC);
   PID_right.SetSampleTime(PIDSampleTime);
   PID_right.SetOutputLimits(0, OutMax);
 
@@ -295,7 +261,7 @@ void setup() {
 
   PID_rear.SetMode(AUTOMATIC);
   PID_rear.SetSampleTime(PIDSampleTime);
-  PID_rear.SetOutputLimits(0, OutMax);*/
+  PID_rear.SetOutputLimits(0, OutMax);
 
   //pinMode(piezzo,OUTPUT); //Buzzer for PID output, find unused pin
 
@@ -479,13 +445,9 @@ void workloop() {
     right_sonar = rangeD; //read I2C sonar range, Value in cm
   }
 
-
- Output_left=PIDCompute(left_sonar, Setpoint_left,left_lastInput);
- left_lastInput=
- Output_right=PIDCompute(right_sonar, Setpoint_right,right_lastInput);
  
   //Run PID loops for each sensor
-  /*if (frontSonarActive == 1) {
+  if (frontSonarActive == 1) {
     PID_front.Compute();
   }
   if (rearSonarActive == 1) {
@@ -496,7 +458,7 @@ void workloop() {
   }
   if (rightSonarActive == 1) {
     PID_right.Compute();
-  }*/
+  }
   
 
 
