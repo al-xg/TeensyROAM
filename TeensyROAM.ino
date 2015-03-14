@@ -4,10 +4,12 @@ unsigned long report_time;
 unsigned long work_time;
 unsigned long RC_time;
 unsigned long tmp_time;
+unsigned long LastActivePPM;
+unsigned long tmpPPMtime;
 
 //PID loops
 //#include "PID_ROAM.h"
-#include <PID_v1.h>
+//#include <PID_v1.h>
 
 double maxRange = 770; //this is the range used by the program for initialisation and when reading the sonar fails
 double Setpoint_right, right_sonar = maxRange, Output_right = 0;
@@ -17,15 +19,51 @@ double Setpoint_rear, rear_sonar = maxRange, Output_rear = 0;
 const double PIDSampleTime = 67; //Interval in ms
 const double safe_distance = 35; //value in cm
 const double OutMax = 600; //value in ms
+
 const double P = 7;
 const double I = 3;
 const double D = 0;
 
 //Specify the links and initial tuning parameters
-PID PID_right(&right_sonar, &Output_right, &Setpoint_right, P, I, D, DIRECT);
+/*PID PID_right(&right_sonar, &Output_right, &Setpoint_right, P, I, D, DIRECT);
 PID PID_front(&front_sonar, &Output_front, &Setpoint_front, P, I, D, DIRECT);
 PID PID_left(&left_sonar, &Output_left, &Setpoint_left, P, I, D, DIRECT);
-PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear, P, I, D, DIRECT);
+PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear, P, I, D, DIRECT);*/
+
+
+const double OutMin = 0; //value in ms
+double ITerm;
+double error;
+double left_lastInput;
+double right_lastInput;
+
+
+double SampleTimeInSec = ((double)PIDSampleTime)/1000;  
+double kp = P;
+double ki = I * SampleTimeInSec;
+double kd = D / SampleTimeInSec;
+
+double PIDCompute(double PIDinput,double PIDsetpoint, double lastInput){
+/*Compute all the working error variables*/
+	  double input = PIDinput;
+      double error = PIDsetpoint - input;
+      ITerm+= (ki * error);
+      if(ITerm > OutMax) ITerm= OutMax;
+      else if(ITerm < OutMin) ITerm= OutMin;
+      double dInput = (PIDinput - lastInput);
+ 
+      /*Compute PID Output*/
+      double PIDoutput = kp * error + ITerm- kd * dInput;
+      
+	  if(PIDoutput > OutMax) PIDoutput = OutMax;
+      else if(PIDoutput < OutMin) PIDoutput = OutMin;
+	  return PIDoutput;
+	  
+	  /*Remember some variables for next time*/
+      //lastInput = input;
+}
+
+
 
 //I2C sonars
 #include <i2c_t3.h>
@@ -159,7 +197,7 @@ PulsePositionInput PPMin;
 //bool PPMactive = 0;
 
 //RC Inputs/outputs
-double channel[8];
+double channel[20];
 double pitch_in = 1500; //channel 4
 double roll_in = 1500; //channel 2
 double throttle_in = 1000; //channel 3
@@ -177,12 +215,12 @@ int ConstrainPWM(int PWM_out, int MinPW, int MaxPW) {
 }
 
 void readPPM() {
-  int i, numCh, LastActivePPM, tmpPPMtime;
+  int i, numCh;
   numCh = PPMin.available();
   if (numCh > 0) {
     //PPMactive = 1;
     //LastActivePPM = millis();
-    for (i = 1; i <= numCh; i++) {
+    for (i = 1; i <= 8; i++) {
       channel[i] = PPMin.read(i);
     }
   }
@@ -224,7 +262,7 @@ void readSpektrum() {
 
 void setup() {
   Serial.begin(115200);    //USB reporting
-  //Serial1.begin(115200); //Spektrum serial
+  Serial1.begin(115200); //Spektrum serial
 
   PPMout.begin(9);
   PulsePositionInput PPMout(RISING);
@@ -235,15 +273,15 @@ void setup() {
 
   //Initiate sonar ranging ready for 1st loop
   ReadI2CSonars();
-  //takeRangeReading(frontI2C);
-  //takeRangeReading(rearI2C);
+  takeRangeReading(frontI2C);
+  takeRangeReading(rearI2C);
   takeRangeReading(leftI2C);
   takeRangeReading(rightI2C);
 
   //Initialise PID loops
   Setpoint_right = Setpoint_front = Setpoint_left = Setpoint_rear = safe_distance;
 
-  PID_right.SetMode(AUTOMATIC);
+  /*PID_right.SetMode(AUTOMATIC);
   PID_right.SetSampleTime(PIDSampleTime);
   PID_right.SetOutputLimits(0, OutMax);
 
@@ -257,7 +295,7 @@ void setup() {
 
   PID_rear.SetMode(AUTOMATIC);
   PID_rear.SetSampleTime(PIDSampleTime);
-  PID_rear.SetOutputLimits(0, OutMax);
+  PID_rear.SetOutputLimits(0, OutMax);*/
 
   //pinMode(piezzo,OUTPUT); //Buzzer for PID output, find unused pin
 
@@ -405,7 +443,7 @@ void RC() {
     aux1 = channel[6];
 
   //}
-
+ 
   //Do we want obstacle avoidance on?
   if (aux1 > 1400) {
     compd_roll = (roll_in - int(Output_right) + int(Output_left));
@@ -428,46 +466,51 @@ void workloop() {
 
   //Refresh sensor readings
   ReadI2CSonars();
-  if (frontSonarActive = 1) {
+  if (frontSonarActive == 1) {
     front_sonar = rangeA; //read I2C sonar range, Value in cm
   }
-  if (rearSonarActive = 1) {
+  if (rearSonarActive == 1) {
     rear_sonar = rangeB; //read I2C sonar range, Value in cm
   }
-  if (leftSonarActive = 1) {
+  if (leftSonarActive == 1) {
     left_sonar = rangeC; //read I2C sonar range, Value in cm
   }
-  if (rightSonarActive = 1) {
+  if (rightSonarActive == 1) {
     right_sonar = rangeD; //read I2C sonar range, Value in cm
   }
 
 
+ Output_left=PIDCompute(left_sonar, Setpoint_left,left_lastInput);
+ left_lastInput=
+ Output_right=PIDCompute(right_sonar, Setpoint_right,right_lastInput);
+ 
   //Run PID loops for each sensor
-  if (frontSonarActive = 1) {
+  /*if (frontSonarActive == 1) {
     PID_front.Compute();
   }
-  if (rearSonarActive = 1) {
+  if (rearSonarActive == 1) {
     PID_rear.Compute();
   }
-  if (leftSonarActive = 1) {
+  if (leftSonarActive == 1) {
     PID_left.Compute();
   }
-  if (rightSonarActive = 1) {
+  if (rightSonarActive == 1) {
     PID_right.Compute();
-  }
+  }*/
+  
 
 
   //Start next ranging cycle ont eh I2C sonars
-  if (frontSonarActive = 1) {
+  if (frontSonarActive == 1) {
     takeRangeReading(rearI2C);
   }
-  if (rearSonarActive = 1) {
+  if (rearSonarActive == 1) {
     takeRangeReading(frontI2C);
   }
-  if (leftSonarActive = 1) {
+  if (leftSonarActive == 1) {
     takeRangeReading(leftI2C);
   }
-  if (rightSonarActive = 1) {
+  if (rightSonarActive == 1) {
     takeRangeReading(rightI2C);
   }
 }
@@ -486,8 +529,6 @@ void loop() {
   }
 
 }
-
-
 
 
 
