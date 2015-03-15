@@ -13,11 +13,11 @@ int flashRate;
 //#include <PID_v1.h>
 
 const double PIDSampleTime = 67; //Interval in ms
-const double safe_distance = 35; //value in cm
+const double safe_distance = 45; //value in cm
 const double OutMax = 600; //value in ms
 const double maxRange = 770; //this is the range used by the program for initialisation and when reading the sonar fails
-const double P = 7;
-const double I = 3;
+const double P = 20;
+const double I = 20;
 const double D = 0;
 double Setpoint_right, right_sonar = maxRange, Output_right = 0;
 double Setpoint_front, front_sonar = maxRange, Output_front = 0;
@@ -60,8 +60,8 @@ bool rearSonarActive = 0;
 //Commands the I2C sensor to take a range reading
 void takeRangeReading(byte Address) {
   Wire.beginTransmission(Address);             //Start addressing
-  Wire.write(RangeCommand);                    //send range command
-  Wire.sendTransmission(I2C_STOP);             //Stop and do something else now
+  Wire.write(RangeCommand);  //send range command
+  Wire.sendTransmission(I2C_STOP);  //Stop and do something else now
   Wire.finish();
 }
 
@@ -81,6 +81,9 @@ short readRange(byte Address) {
 }
 
 void ReadI2CSonars() {
+  
+  
+  
   front_fn = 0;
   rear_fn = 0;
   left_fn = 0;
@@ -91,10 +94,10 @@ void ReadI2CSonars() {
   left_sz = 0;
   right_sz = 0;
 
-  /*front_sonar=maxRange;
+  front_sonar=maxRange;
   rear_sonar=maxRange;
   left_sonar=maxRange;
-  right_sonar=maxRange;*/
+  right_sonar=maxRange;
 
   int timeout = millis() + 1;
   while ((front_fn != 1 & rear_fn != 1 & left_fn != 1 & right_fn != 1) & (timeout > millis())) {
@@ -105,7 +108,7 @@ void ReadI2CSonars() {
       }
     }
     else {
-      front_sz = Wire.requestFrom(frontI2C, byte(2));
+      front_sz = Wire.requestFrom(frontI2C, byte(2)); //I2C_STOP,1000);
     }
 
 
@@ -423,7 +426,7 @@ void RC() {
 
   //Do we want obstacle avoidance on?
   if (aux1 > 1400) {
-    flashRate=250;
+    flashRate=125;
     compd_roll = (roll_in - int(Output_right) + int(Output_left));
     compd_pitch = (pitch_in - int(Output_rear) + int(Output_front));
     compd_roll = ConstrainPWM(compd_roll, 990, 2015);
