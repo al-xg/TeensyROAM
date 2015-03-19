@@ -16,19 +16,19 @@ const double PIDSampleTime = 67; //Interval in ms
 const double safe_distance = 45; //value in cm
 const double OutMax = 550; //value in ms
 const double maxRange = 770; //this is the range used by the program for initialisation and when reading the sonar fails
-const double P = 15;
+const double P = 10;
 const double I = 15;
 const double D = 0;
-double Setpoint_right, right_sonar = maxRange, Output_right = 0;
-double Setpoint_front, front_sonar = maxRange, Output_front = 0;
-double Setpoint_left, left_sonar = maxRange, Output_left = 0;
-double Setpoint_rear, rear_sonar = maxRange, Output_rear = 0;
+double Setpoint_right, right_sonar = maxRange, Output_right = 0;//, Dcap_right=-100 ; //Dcap is the max difference in distance (mm) between two range readings before the D term is ignored
+double Setpoint_front, front_sonar = maxRange, Output_front = 0;//, Dcap_front=-100;
+double Setpoint_left, left_sonar = maxRange, Output_left = 0;//, Dcap_left=-100;
+double Setpoint_rear, rear_sonar = maxRange, Output_rear = 0;//, Dcap_rear=-100;
 
 //Specify the links and initial tuning parameters
-PID PID_right(&right_sonar, &Output_right, &Setpoint_right, P, I, D, DIRECT);
-PID PID_front(&front_sonar, &Output_front, &Setpoint_front, P, I, D, DIRECT);
-PID PID_left(&left_sonar, &Output_left, &Setpoint_left, P, I, D, DIRECT);
-PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear, P, I, D, DIRECT);
+PID PID_right(&right_sonar, &Output_right, &Setpoint_right, P, I, D, DIRECT);//,&Dcap_right);
+PID PID_front(&front_sonar, &Output_front, &Setpoint_front, P, I, D, DIRECT);//,&Dcap_front);
+PID PID_left(&left_sonar, &Output_left, &Setpoint_left, P, I, D, DIRECT);//,&Dcap_left);
+PID PID_rear(&rear_sonar, &Output_rear, &Setpoint_rear, P, I, D, DIRECT);//,&Dcap_rear);
 
 
 //I2C sonars
@@ -100,7 +100,7 @@ void ReadI2CSonars() {
   right_sonar=maxRange;
 
   int timeout = millis() + 1;
-  while ((front_fn != 1 & rear_fn != 1 & left_fn != 1 & right_fn != 1) & (timeout > millis())) {
+  while (((front_fn != 1) & (rear_fn != 1) & (left_fn != 1) & (right_fn != 1)) & (timeout > millis())) {
     if ((front_sz == 2)) {
       if (front_fn == 0) {
         front_sonar = readRange(frontI2C);
@@ -301,7 +301,16 @@ void buzzer() {
    else analogWrite(piezzo,0);*/
 }
 
-
+//Formatting for use with MegunoLink's Timeplot
+void MegunoFormat( const char* Name, int Value, const char* Channel) {
+  Serial.print(F("{TIMEPLOT:"));
+  Serial.print(Channel);
+  Serial.print(F("|data|"));
+  Serial.print(Name);
+  Serial.print(F("|T|"));
+  Serial.print(Value);
+  Serial.print(F("}"));
+}
   
 
 void report() {
