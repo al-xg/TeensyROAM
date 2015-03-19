@@ -14,10 +14,10 @@ int flashRate;
 
 const double PIDSampleTime = 67; //Interval in ms
 const double safe_distance = 45; //value in cm
-const double OutMax = 600; //value in ms
+const double OutMax = 550; //value in ms
 const double maxRange = 770; //this is the range used by the program for initialisation and when reading the sonar fails
-const double P = 20;
-const double I = 20;
+const double P = 15;
+const double I = 15;
 const double D = 0;
 double Setpoint_right, right_sonar = maxRange, Output_right = 0;
 double Setpoint_front, front_sonar = maxRange, Output_front = 0;
@@ -156,8 +156,6 @@ void ReadI2CSonars() {
   }
 }
 
-//Meguno Link
-char channelName[ ] = "debug";
 
 //PPM Read/Write
 #include "PulsePosition.h"
@@ -197,8 +195,8 @@ void readPPM() {
   else {
     //check how long it has been since last PPM signal
     tmpPPMtime = millis();
-    if (tmpPPMtime > LastActivePPM + 54) { //DR4-II frame is 27ms
-      PPMactive = 0; //I'm being stupid here...
+    if (tmpPPMtime > LastActivePPM + 108) { //DR4-II frame is 27ms
+      PPMactive = 0; 
     }
   }
 }
@@ -243,7 +241,8 @@ void readSpektrum() {
 
 void setup() {
   Serial.begin(115200);    //USB reporting
-  Serial1.begin(115200); //Spektrum serial
+ // Serial1.begin(115200);   //Spektrum serial
+ // Serial3.begin(115200);   //Telemetry
 
   // initialize digital pin 13 as an output.
   pinMode(13, OUTPUT);
@@ -302,112 +301,37 @@ void buzzer() {
    else analogWrite(piezzo,0);*/
 }
 
+
+  
+
 void report() {
   report_time = millis();
 
-  Serial.print(F("{TIMEPLOT:PID|data|Output_left|T|"));
-  Serial.print(Output_left);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|Output_right|T|"));
-  Serial.print(Output_right);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|Output_front|T|"));
-  Serial.print(Output_front);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|Output_rear|T|"));
-  Serial.print(Output_rear);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|safe_distance|T|"));
-  Serial.print(safe_distance);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|LeftSonar|T|"));
-  Serial.print(left_sonar);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|RightSonar|T|"));
-  Serial.print(right_sonar);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|FrontSonar|T|"));
-  Serial.print(front_sonar);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|RearSonar|T|"));
-  Serial.print(rear_sonar);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|AileronOut|T|"));
-  Serial.print(compd_roll);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:PID|data|ElevonOut|T|"));
-  Serial.print(compd_pitch);
-  Serial.print(F("}"));
-
-  Serial.print(F("{TIMEPLOT:RC|data|Aileron|T|"));
-  Serial.print(roll_in);
-  Serial.println(F("}"));
-
-  Serial.print(F("{TIMEPLOT:RC|data|Elevon|T|"));
-  Serial.print(pitch_in);
-  Serial.println(F("}"));
-
-  Serial.print(F("{TIMEPLOT:RC|data|Rudder|T|"));
-  Serial.print(yaw_in);
-  Serial.println(F("}"));
-
-  Serial.print(F("{TIMEPLOT:RC|data|throttle|T|"));
-  Serial.print(throttle_in);
-  Serial.println(F("}"));
-
-  Serial.print(F("{TIMEPLOT:RC|data|Mode|T|"));
-  Serial.print(mode_switch);
-  Serial.println(F("}"));
-
-  Serial.print(F("{TIMEPLOT:RC|data|Aux1|T|"));
-  Serial.print(aux1);
-  Serial.println(F("}"));
-
-  /*Serial.print(F("{TIMEPLOT:PIDsettings|data|Kd|T|"));
-   Serial.print(PID_right.GetKd());
-   Serial.println(F("}"));
-
-   Serial.print(F("{TIMEPLOT:PIDsettings|data|Ki|T|"));
-   Serial.print(PID_right.GetKi());
-   Serial.println(F("}"));
-
-   Serial.print(F("{TIMEPLOT:PIDsettings|data|Kp|T|"));
-   Serial.print(PID_right.GetKp());
-   Serial.println(F("}"));
-
-   Serial.print(F("{TIMEPLOT:Variables|data|millis()|T|"));
-   Serial.print(millis());
-   Serial.println(F("}"));
-
-   Serial.print(F("{TIMEPLOT:Variables|data|tmp_time|T|"));
-   Serial.print(tmp_time);
-   Serial.println(F("}"));
-
-
-   Serial.print("{MESSAGE:");
-   Serial.print(channelName);
-   Serial.print("|data|");
-   Serial.print(millis());
-   Serial.print(",");
-   Serial.print(TCNT1);
-   Serial.print(",");
-   Serial.print(right_sonar);
-   Serial.println("}");
-
-   */
-  //Serial.print(" \n");
-
+  //PID varaibles
+  MegunoFormat("Output_left",Output_left,"PID");
+  MegunoFormat("Output_right",Output_right,"PID");
+  //MegunoFormat("Output_front",Output_front,"PID");
+  //MegunoFormat("Output_rear",Output_rear,"PID");
+  MegunoFormat("safe_distance",safe_distance,"PID");
+  MegunoFormat("left_sonar",left_sonar,"PID");
+  MegunoFormat("right_sonar",right_sonar,"PID");
+  //MegunoFormat("front_sonar",front_sonar,"PID");
+  //MegunoFormat("rear_sonar",rear_sonar,"PID");
+  MegunoFormat("roll_in",roll_in,"PID");
+  MegunoFormat("compd_roll",compd_roll,"PID");
+  MegunoFormat("pitch_in",pitch_in,"PID");
+  MegunoFormat("compd_pitch",compd_pitch,"PID");
+  
+  //RC input varaibles
+  MegunoFormat("roll_in",roll_in,"RC");
+  MegunoFormat("pitch_in",pitch_in,"RC");
+  MegunoFormat("yaw_in",yaw_in,"RC");
+  MegunoFormat("throttle_in",throttle_in,"RC");
+  MegunoFormat("mode_switch",mode_switch,"RC");
+  MegunoFormat("aux1",aux1,"RC");
 }
+
+
 void RC() {
   RC_time = millis();
   //Refresh RC inputs
@@ -447,7 +371,7 @@ void workloop() {
   work_time = millis();
 
   //Refresh sensor readings
-  ReadI2CSonars();
+   ReadI2CSonars();
 
   //Run PID loops for each sensor and start next ranging cycle on the I2C sonars
   if (frontSonarActive == 1) {
